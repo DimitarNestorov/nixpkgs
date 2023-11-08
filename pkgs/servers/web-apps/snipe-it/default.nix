@@ -30,6 +30,9 @@ let
 
       substituteInPlace config/database.php --replace "env('DB_DUMP_PATH', '/usr/local/bin')" "env('DB_DUMP_PATH', '${mariadb}/bin')"
       substituteInPlace config/backup.php --replace "base_path('public/uploads')" "'${dataDir}/public/uploads'"
+      substituteInPlace config/backup.php --replace "base_path('vendor')," ""
+      substituteInPlace config/backup.php --replace "base_path('config')," ""
+      substituteInPlace config/backup.php --replace "base_path('node_modules')," ""
     '';
   });
 
