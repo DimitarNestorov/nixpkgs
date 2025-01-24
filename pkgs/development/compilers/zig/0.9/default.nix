@@ -79,6 +79,8 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     substituteInPlace lib/std/zig/system/NativeTargetInfo.zig \
       --replace "/usr/bin/env" "${lib.getExe' coreutils "env"}"
+    substituteInPlace lib/std/zig/system/darwin.zig \
+      --replace "/usr/bin/xcrun" "xcrun"
   '';
 
   installCheckPhase = ''
