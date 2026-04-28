@@ -38,11 +38,17 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-oeXSOxogfAazRsKfngq2+DOyo//wRJQSqm7gaCza4WY=";
   };
 
+  patches = [
+    # Remove after upstream updates to Yarn 4.14
+    # https://github.com/45Drives/cockpit-zfs/blob/main/package.json#L13
+    ./yarn-4.14-support.patch
+  ];
+
   missingHashes = ./missing-hashes.json;
 
   offlineCache = yarn-berry.fetchYarnBerryDeps {
-    inherit (finalAttrs) src missingHashes;
-    hash = "sha256-YnR1SqBGnxEQaGUGMNTHHEGcOIhuGbWnqMdr4eRGXcA=";
+    inherit (finalAttrs) src missingHashes patches;
+    hash = "sha256-Tdxe5bXN9psSrnUXL1f+1nh4WPzuvOI7j0I+VPU2/1s=";
   };
 
   nativeBuildInputs = [
