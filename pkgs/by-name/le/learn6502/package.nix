@@ -34,6 +34,8 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   patches = [
+    ./get-yarn-from-path.patch
+
     # Remove after upstream updates to Yarn 4.14
     # https://github.com/JumpLink/Learn6502/blob/main/package.json#L36
     ./yarn-4.14-support.patch
@@ -48,6 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     nodejs
+    yarn-berry
     yarn-berry.yarnBerryConfigHook
     meson
     ninja
