@@ -8,7 +8,6 @@
   pkg-config,
   node-gyp,
   python3Packages,
-  electron_42,
   vips,
   xvfb-run,
   copyDesktopItems,
@@ -18,7 +17,16 @@
 }:
 let
   yarn-berry = yarn-berry_4;
-  electron = electron_42;
+  electron =
+    (import
+      (fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/ac6b2166e7a9375683b8e98f860f273222337b16.tar.gz";
+        sha256 = "sha256:0k6m5apwzg36qkm3wil1pf4q0lv1hp7r2imx4nfz9bfssnk9gj5w";
+      })
+      {
+        system = stdenv.hostPlatform.system;
+      }
+    ).pkgs.electron_42;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "rocketchat-desktop";

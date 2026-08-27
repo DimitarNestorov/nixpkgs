@@ -9,7 +9,6 @@
   gclient2nix,
   nodejs,
   npmHooks,
-  yarn-berry_4,
   unzip,
   writers,
   substitute,
@@ -25,18 +24,20 @@
 
 let
   gclientDeps = gclient2nix.importGclientDeps info.deps;
-  yarn-berry = yarn-berry_4;
+  yarn-berry =
+    (import
+      (fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/ac6b2166e7a9375683b8e98f860f273222337b16.tar.gz";
+        sha256 = "sha256:0k6m5apwzg36qkm3wil1pf4q0lv1hp7r2imx4nfz9bfssnk9gj5w";
+      })
+      {
+        system = stdenv.hostPlatform.system;
+      }
+    ).pkgs.yarn-berry_4;
 
   # Only apply to old versions after upstream updates to Yarn 4.15
   # https://github.com/electron/electron/blob/main/package.json#L152
-  yarnPatch = substitute {
-    src = ./yarn-fix.patch;
-    substitutions = [
-      "--replace-fail"
-      "YARN_LOCKFILE_VERSION_PLACEHOLDER"
-      yarn-berry_4.lockfileVersion
-    ];
-  };
+  yarnPatch = ./yarn-4.14-support.patch;
 in
 
 ((chromium.override { upstream-info = info.chromium; }).mkDerivation (base: {

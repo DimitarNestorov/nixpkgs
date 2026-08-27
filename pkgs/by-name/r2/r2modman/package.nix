@@ -3,7 +3,6 @@
   stdenv,
   copyDesktopItems,
   dart-sass,
-  electron,
   fetchFromGitHub,
   makeDesktopItem,
   makeWrapper,
@@ -11,6 +10,19 @@
   yarn-berry,
   substitute,
 }:
+
+let
+  electron =
+    (import
+      (fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/ac6b2166e7a9375683b8e98f860f273222337b16.tar.gz";
+        sha256 = "sha256:0k6m5apwzg36qkm3wil1pf4q0lv1hp7r2imx4nfz9bfssnk9gj5w";
+      })
+      {
+        system = stdenv.hostPlatform.system;
+      }
+    ).pkgs.electron;
+in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "r2modman";
