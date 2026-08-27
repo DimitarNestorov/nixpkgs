@@ -10,6 +10,7 @@
   stdenv,
   versionCheckHook,
   yarn-berry,
+  substitute,
   plugins ? [ ],
 }:
 let
@@ -73,7 +74,7 @@ let
         pathAbsoluteFallback -> ${pathAbsoluteFallback}
       '' throw "${plugin.pname}: does not provide parse-able entry point";
 
-  yarnHash = "sha256-KQywjBgJcT6CXT8bd11wT26qmfLen8E/gXhPBA5TY9A=";
+  yarnHash = "sha256-uIIIGQ8LELIGAeAwYDpKq3louPScSyVTPM7Uhh0ctyc=";
 
   prettier-oxc-wasm-parser = stdenv.mkDerivation (finalAttrs: {
     pname = "binding-wasm32-wasi";
@@ -139,20 +140,30 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "prettier";
     repo = "prettier";
     tag = finalAttrs.version;
-    hash = "sha256-7B8AnLPC2CcgdR/Jz0TvMhqYCCEf345U6xlWB7QaIqg=";
-  };
+    hash = "sha256-Ki6HZfiYiyAvF9MtTqPV45ZPusHZ3AMQ82Z9/y/6M4I=";
 
-  patches = [
-    # Remove after upstream updates to Yarn 4.14
-    # https://github.com/prettier/prettier/blob/main/package.json#L265
-    ./yarn-4.14-support.patch
-  ];
+    # Remove when updating since upstream updated Yarn
+    # https://github.com/prettier/prettier/commit/70565262f7c53ede35c5a0dad6b844f17aa598b3
+    postFetch = ''
+      cd $out
+      patch -p1 < ${
+        (substitute {
+          src = ./yarn-fix.patch;
+          substitutions = [
+            "--replace-fail"
+            "YARN_LOCKFILE_VERSION_PLACEHOLDER"
+            yarn-berry.lockfileVersion
+          ];
+        })
+      }
+    '';
+  };
 
   missingHashes = ./missing-hashes.json;
 
   offlineCache = yarn-berry.fetchYarnBerryDeps {
 
-    inherit (finalAttrs) src missingHashes patches;
+    inherit (finalAttrs) src missingHashes;
     hash = yarnHash;
 
   };

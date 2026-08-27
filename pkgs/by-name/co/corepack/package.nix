@@ -3,6 +3,7 @@
   stdenvNoCC,
   cacert,
   yarn-berry,
+  substitute,
   nodejs-slim, # no need for npm
   fetchFromGitHub,
   nix-update-script,
@@ -21,7 +22,23 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     owner = "nodejs";
     repo = "corepack";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-VgiQ4k6HiRxemtizItL0zkTDpgTnL0ScfSOfgjMpokI=";
+    hash = "sha256-k5lsNYy6mYXc+vBJQRJ1So2uBWsOqhabqskuMMbIaQU=";
+
+    # Remove after upstream updates to Yarn 4.15
+    # https://github.com/nodejs/corepack/blob/main/package.json#L19
+    postFetch = ''
+      cd $out
+      patch -p1 < ${
+        (substitute {
+          src = ./yarn-fix.patch;
+          substitutions = [
+            "--replace-fail"
+            "YARN_LOCKFILE_VERSION_PLACEHOLDER"
+            yarn-berry.lockfileVersion
+          ];
+        })
+      }
+    '';
   };
 
   nativeBuildInputs = [
@@ -40,7 +57,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       missingHashes
       src
       ;
-    hash = "sha256-Q7vUJrFUr8ZbDdaMZq8fnJFfIgEFYkHQiUoo2xILaKo=";
+    hash = "sha256-z+2+RKv7EYKk0Xwnwm8B28c//LOdl7aV4/0NzRpaJD4=";
   };
 
   postPatch = ''
